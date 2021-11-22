@@ -12,8 +12,28 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    # Todo: List all the routes available
-    return "Welcome to my 'Home' page!"
+    return (
+        # space key: &nbsp;
+        # '<' key : &lt;
+        # '>' key : &gt;
+        f'Welcome to My Climate API Service<br/><br/>'
+        f'Available Routes:<br/>'
+        f'{"&nbsp;"*6}/api/v1.0/precipitation<br/>'
+        f'{"&nbsp;"*12}Receive date and precipitation values recorded in JSON format.<br/>'
+        f'{"&nbsp;"*6}/api/v1.0/stations<br/>'
+        f'{"&nbsp;"*12}Receive information about the recording stations in JSON format.<br/>'
+        f'{"&nbsp;"*6}/api/v1.0/tobs<br/>'
+        f'{"&nbsp;"*12}Receive temperature data from the most active recording station in '
+            f' JSON format.<br/>'
+        f'{"&nbsp;"*6}/api/v1.0/&lt;start&gt;<br/>'
+        f'{"&nbsp;"*12}Replace &lt;start&gt; with a date in yyyy-mm-dd<br/>'
+        f'{"&nbsp;"*12}Receive Minimum, Highest, and Average temperatures starting at the date you entered '
+            f'in a JSON format.<br/>'
+        f'{"&nbsp;"*6}/api/v1.0/&lt;start&gt;/&lt;end&gt;<br/>'
+        f'{"&nbsp;"*12}Replace &lt;end&gt; with a date in yyyy-mm-dd<br/>'
+        f'{"&nbsp;" * 12}Receive Minimum, Highest, and Average temperatures starting at the date you entered '
+            f'up to the end date in JSON format. <br/>'
+    )
 
 
 @app.route("/api/v1.0/precipitation")
