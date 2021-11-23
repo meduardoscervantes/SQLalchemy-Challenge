@@ -72,13 +72,26 @@ def precipitation():
     for date, prcp in data:
         new_dict = {"date": date, "prcp": prcp}
         json_data.append(new_dict)
-    return jsonify(json_data)
+    return jsonify(json_data)  # Return all of the dates/prcp data in JSON
 
 
 @app.route("/api/v1.0/stations")
 def stations():
-    # Todo:Return a JSON list of stations from the dataset.
-    return "Welcome to my 'About' page!"
+    ###########################
+    # Establish/close session #
+    ###########################
+    session = Session(engine)
+    data = session.query(Station.name, Station.longitude, Station.latitude, Station.elevation).all()
+    session.close()
+
+    ###############################
+    # Create the JSON information #
+    ###############################
+    json_data = []
+    for name, longitude, latitude, elevation in data:
+        new_dict = {"name": name, "longitude": longitude, "latitude": latitude, "elevation": elevation}
+        json_data.append(new_dict)
+    return jsonify(json_data)  # Return all of the Station data in JSON
 
 
 @app.route("/api/v1.0/tobs")
