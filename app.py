@@ -96,10 +96,22 @@ def stations():
 
 @app.route("/api/v1.0/tobs")
 def tobs():
-    # Todo:Query the dates and temperature observations
-    #   of the most active station for the last year of data.
-    #   Return a JSON list of temperature observations (TOBS) for the previous year.
-    return "Welcome to my 'About' page!"
+    ###########################
+    # Establish/close session #
+    ###########################
+    session = Session(engine)
+    data = session.query(Station.name, Measurement.date, Measurement.tobs).filter(Measurement.date >= '2016-08-23').where(
+        Station.id == 7).all()
+    session.close()
+
+    ###############################
+    # Create the JSON information #
+    ###############################
+    json_data = []
+    for name, date, tobs in data:
+        new_dict = {"name": name, "date": date, "temperature": tobs}
+        json_data.append(new_dict)
+    return jsonify(json_data)
 
 
 @app.route("/api/v1.0/<start>")
