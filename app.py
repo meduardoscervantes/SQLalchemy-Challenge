@@ -6,6 +6,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func, inspect, desc
 from flask import Flask, jsonify
+import pandas as pd
 
 ##################################
 # create engine to hawaii.sqlite #
@@ -57,9 +58,21 @@ def home():
 
 @app.route("/api/v1.0/precipitation")
 def precipitation():
-    # Todo:Convert the query results to a dictionary using
-    #   date as the key and prcp as the value.
-    return "Welcome to my 'About' page!"
+    ###########################
+    # Establish/close session #
+    ###########################
+    session = Session(engine)
+    data = session.query(Measurement.date, Measurement.prcp).all()
+    session.close()
+
+    ###############################
+    # Create the JSON information #
+    ###############################
+    json_data = []
+    for date, prcp in data:
+        new_dict = {"date": date, "prcp": prcp}
+        json_data.append(new_dict)
+    return jsonify(json_data)
 
 
 @app.route("/api/v1.0/stations")
