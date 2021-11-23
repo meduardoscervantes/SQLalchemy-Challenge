@@ -116,11 +116,9 @@ def tobs():
 
 @app.route("/api/v1.0/<start>")
 def start_temp(start):
-    # Todo:Return a JSON list of the minimum temperature, the average temperature,
-    #   and the max temperature for a given start or start-end range.
-    ###########################
-    # Establish/close session #
-    ###########################
+    ##########################################################
+    # Check to see if the date exists and proceed from there #
+    ##########################################################
     session = Session(engine)
     df = pd.DataFrame(session.query(Measurement.date))
     df.columns = ["date"]
@@ -138,10 +136,36 @@ def start_temp(start):
 
 
 @app.route("/api/v1.0/<start>/<end>")
-def range_temp():
-    # Todo:Return a JSON list of the minimum temperature, the average temperature,
-    #   and the max temperature for a given start or start-end range.
-    return "Welcome to my 'About' page!"
+def range_temp(start, end):
+    ##########################################################
+    # Check to see if the date exists and proceed from there #
+    ##########################################################
+    session = Session(engine)
+    df = pd.DataFrame(session.query(Measurement.date))
+    df.columns = ["date"]
+
+    if start not in df["date"].tolist():  # Check if the start date exists
+        session.close()
+        return jsonify({"error": f"Start date: {start} not found."}), 404
+
+    if end not in df["date"].tolist():  # Check if the end date exists
+        session.close()
+        return jsonify({"error": f"End date: {end} not found."}), 404
+
+    if start > end:  # Ensure the start date comes before the end date.
+        session.close()
+        return jsonify({"error": f"Not correct start/end format... Make sure the start date is before end date"}), 404
+
+    if start in df["date"].tolist() and end in df["date"].tolist():  # Ensure the date exists in the DB
+        data = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)) \
+            .filter(Measurement.date >= start).filter(Measurement.date <= end).all()
+        session.close()
+        json_data = []
+        for x, y, z in data:
+            new_dict = {"units": "fahrenheit", "min": x, "avg": y, "max": z}
+            json_data.append(new_dict)
+        session.close()
+        return jsonify(json_data)
 
 
 if __name__ == "__main__":
