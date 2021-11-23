@@ -7,15 +7,34 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func, inspect, desc
 from flask import Flask, jsonify
 
+##################################
+# create engine to hawaii.sqlite #
+##################################
+import os
+os.chdir("Resources")
+engine = create_engine("sqlite:///hawaii.sqlite")
+os.chdir("..")
+#################################################
+# reflect an existing database into a new model #
+#################################################
+Base = automap_base()
+# reflect the tables
+Base.prepare(engine, reflect=True)
+#################################
+# Save references to each table #
+#################################
+Measurement = Base.classes.measurement
+Station = Base.classes.station
+
 app = Flask(__name__)
 
 
 @app.route("/")
 def home():
     return (
-        # space key: &nbsp;
-        # '<' key : &lt;
-        # '>' key : &gt;
+        # space key : &nbsp;
+        # '<' key   : &lt;
+        # '>' key   : &gt;
         f'Welcome to My Climate API Service<br/><br/>'
         f'Available Routes:<br/>'
         f'{"&nbsp;"*6}/api/v1.0/precipitation<br/>'
