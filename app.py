@@ -100,7 +100,7 @@ def tobs():
     # Establish/close session #
     ###########################
     session = Session(engine)
-    data = session.query(Station.name, Measurement.date, Measurement.tobs).filter(Measurement.date >= '2016-08-23')\
+    data = session.query(Station.station, Measurement.date, Measurement.tobs).filter(Measurement.date >= '2016-08-23')\
         .where(Station.id == 7).all()
     session.close()
 
