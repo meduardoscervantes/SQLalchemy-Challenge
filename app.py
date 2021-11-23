@@ -100,8 +100,8 @@ def tobs():
     # Establish/close session #
     ###########################
     session = Session(engine)
-    data = session.query(Station.name, Measurement.date, Measurement.tobs).filter(Measurement.date >= '2016-08-23').where(
-        Station.id == 7).all()
+    data = session.query(Station.name, Measurement.date, Measurement.tobs).filter(Measurement.date >= '2016-08-23')\
+        .where(Station.id == 7).all()
     session.close()
 
     ###############################
@@ -115,10 +115,26 @@ def tobs():
 
 
 @app.route("/api/v1.0/<start>")
-def start_temp():
+def start_temp(start):
     # Todo:Return a JSON list of the minimum temperature, the average temperature,
     #   and the max temperature for a given start or start-end range.
-    return "Welcome to my 'About' page!"
+    ###########################
+    # Establish/close session #
+    ###########################
+    session = Session(engine)
+    df = pd.DataFrame(session.query(Measurement.date))
+    df.columns = ["date"]
+    if start in df["date"].tolist():
+        data = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs))\
+            .filter(Measurement.date >= start).all()
+        session.close()
+        json_data = []
+        for x, y, z in data:
+            new_dict = {"units": "fahrenheit", "min": x, "avg": y, "max": z}
+            json_data.append(new_dict)
+        return jsonify(json_data)
+    session.close()
+    return jsonify({"error": f"Date: {start} not found."}), 404
 
 
 @app.route("/api/v1.0/<start>/<end>")
